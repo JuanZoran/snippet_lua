@@ -18,7 +18,7 @@ local M = {}
 ---A wrapper for `require 'luasnip.extras.postfix'.postfix`.
 ---@param trig string|table -- Trigger string or table of trigger strings.
 ---@param pattern string -- Pattern to replace with. [Placeholder]: `<++>`.
-M.pos   = function(trig, pattern)
+M.pos = function(trig, pattern)
     return postfix(':' .. trig, {
         f(function(_, parent)
             return pattern:gsub('<%+%+>', parent.snippet.env.POSTFIX_MATCH)
@@ -78,6 +78,22 @@ M.hid = function(trig, ...)
     return s(tbl, ...)
 end
 
+
+
+local meta = {
+    add = function(self, plugin)
+        self.size = self.size + 1
+        self[self.size] = plugin
+    end,
+}
+meta.__index = meta
+M.new = function()
+    return setmetatable({
+        size = 0,
+    }, meta)
+end
+
+
 ---A simple wrapper for hidden snippets
 ---@param trig string -- Trigger string.
 ---@param ... any other arguments
@@ -87,4 +103,3 @@ M.hida = function(trig, ...)
 end
 
 return M
-

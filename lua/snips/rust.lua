@@ -1,4 +1,4 @@
-local snips = util.list()
+local snips = new()
 
 snips:add(pos('d', 'dbg!(<++>)'))
 snips:add(pos('p', 'print!(<++>)'))
@@ -30,6 +30,7 @@ match <> {<>
         }),
     }, { trim_empty = false, dedent = false }), true),
 }), { stored = { expr = i(1, 'expr') } }))
+
 
 -- End Snippets --
 return snips

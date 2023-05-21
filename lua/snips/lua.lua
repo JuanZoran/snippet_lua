@@ -20,7 +20,7 @@
 -- events = require("luasnip.util.events")
 -- parse  = require("luasnip.util.parser").parse_snippet
 -- ai     = require("luasnip.nodes.absolute_indexer")
-local snips = util.list()
+local snips = new()
 snips:add(s('req', fmt('local {} = require("{}")', {
     l(l._1:match '[^./]*$', 1),
     i(1, 'module'),
@@ -36,6 +36,9 @@ snips:add(s('ll', fmt('local {} = {}', {
 --  ╭──────────────────────────────────────────────────────────╮
 --  │                       for Snippet                        │
 --  ╰──────────────────────────────────────────────────────────╯
+snips:add(hid('re', t'return'))
+
+
 snips:add(hida('snip', 'snips:add(${0})'))
 snips:add(hida('p', 'print($0)'))
 snips:add(hida('s', 's($1, ${0})'))

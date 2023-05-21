@@ -35,7 +35,7 @@
 ---@param context s_content|string Passing a string is equivalent to passing
 ---@param nodes snippetNode|snippetNode[] A single node or a list of nodes. The nodes that make up the snippet.
 ---@param opts? s_opts A table with the following valid keys:
-function s(context, nodes, opts)
+function _G.s(context, nodes, opts)
 end
 
 --   ```lua
@@ -86,7 +86,6 @@ end
 ---@field callbacks table Contains functions that are called upon entering/leaving a node of this snippet.
 ---@field child_ext_opts table Control `ext_opts` applied to the children of this snippet. More info on those in the [ext_opts](#ext_opts)-section.
 
-
 -- The most simple kind of node; just text.
 --
 -- ```lua
@@ -120,7 +119,7 @@ end
 
 
 ---@param jump_index number @this determines when this node will be jumped to (see [Basics-Jump-Index](#jump-index)).
----@param text string|string[] @a single string for just one line, a list with >1 entries for multiple lines. This text will be SELECTed when the `insertNode` is jumped into.
+---@param text string|string[]? @a single string for just one line, a list with >1 entries for multiple lines. This text will be SELECTed when the `insertNode` is jumped into.
 ---@param node_opts? table @described in [Node](#node)
 ---@return snippetNode
 -- These Nodes contain editable text and can be jumped to- and from (e.g.
@@ -209,8 +208,8 @@ end
 ---     strings for multiline strings, where all lines following the first will be
 ---     prefixed with the snippets' indentation.
 ---@param fn fun(argnode_text: string[][], parent: snippetNode, user_args1: any, ...: any) : string|string[]
----@param argnodes_text node_reference[] the text currently contained in the argnodes
----@param argnode_references node_reference[] the node references of the argnodes
+---@param argnodes_text? node_reference[] the text currently contained in the argnodes
+---@param argnode_references? node_reference[] the node references of the argnodes
 ---@return snippetNode
 -- ```lua
 -- local function fn(
@@ -280,7 +279,7 @@ end
 --  }))
 -- ```
 --   which are further explained in [Snippets](#snippets).
----@param jump_index number since snippetNodes can be jumped to, they need a jump-index (Info in [Basics-Jump-Index](#jump-index)).
+---@param jump_index number? since snippetNodes can be jumped to, they need a jump-index (Info in [Basics-Jump-Index](#jump-index)).
 --   Note that `snippetNode`s don't accept an `i(0)`, so the jump-indices of the nodes
 --   inside them have to be in `1,2,...,n`.
 ---@param nodes snippetNode[]|snippetNode the nodes. A list of nodes will be turned into a `snippetNode`.
@@ -298,7 +297,7 @@ end
 
 ---@param jump_index number since choiceNodes can be jumped to, they need a jump-index (Info in [Basics-Jump-Index](#jump-index)).
 ---@param choices snippetNode[]|snippetNode the choices. The first will be initialliy active. A list of nodes will be turned into a `snippetNode`.
----@param node_opts table
+---@param node_opts? table
 ---@return snippetNode
 -- ChoiceNodes allow choosing between multiple nodes.
 --
@@ -393,10 +392,13 @@ _G.dl = extras.dynamic_lambda
 function parse(trig, pattern, opts)
 end
 
-
 -- Custom functions
-_G.pos = util.snip.pos
-_G.dyn = util.snip.dyn
-_G.opt = util.snip.opt
-_G.hid = util.snip.hid
-_G.hida = util.snip.hida
+
+
+local mod = require 'snippet_lua'
+_G.pos    = mod.pos
+_G.dyn    = mod.dyn
+_G.opt    = mod.opt
+_G.hid    = mod.hid
+_G.hida   = mod.hida
+_G.new    = mod.new

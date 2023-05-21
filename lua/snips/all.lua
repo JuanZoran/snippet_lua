@@ -1,5 +1,5 @@
 ---@diagnostic disable: unused-local, need-check-nil, undefined-global
-local snips = util.list()
+local snips = new()
 local function bash(_, snip)
     local file = io.popen(snip.trigger, 'r')
     local res = {}

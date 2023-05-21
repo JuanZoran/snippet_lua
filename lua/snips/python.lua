@@ -1,4 +1,4 @@
-local snips = util.list()
+local snips = new()
 
 snips:add(s('env', t '#!/usr/bin/env python3'))
 

@@ -9,7 +9,7 @@ local filetypes = {
     'json',
     'html',
 }
-local snips = util.list()
+local snips = new()
 
 for _, value in ipairs(filetypes) do
     -- TODO :

@@ -1,4 +1,4 @@
-local snips = util.list()
+local snips = new()
 
 snips:add(s('formate', { t '// clang-format on' }))
 snips:add(s('formatd', { t '// clang-format off' }))

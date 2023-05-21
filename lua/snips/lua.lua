@@ -100,6 +100,5 @@ snips:add(s('if', fmta([[
     }, { trim_empty = false })),
 })))
 
-
 -- End Snippets --
 return snips

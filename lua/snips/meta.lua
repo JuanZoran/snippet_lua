@@ -35,7 +35,7 @@
 ---@param context s_content|string Passing a string is equivalent to passing
 ---@param nodes snippetNode|snippetNode[] A single node or a list of nodes. The nodes that make up the snippet.
 ---@param opts? s_opts A table with the following valid keys:
-function _G.s(context, nodes, opts)
+function s(context, nodes, opts)
 end
 
 --   ```lua
@@ -389,6 +389,7 @@ _G.dl = extras.dynamic_lambda
 ---@param trig? string|table -- Trigger string.
 ---@param pattern string -- Pattern to replace with. $[index] | ${[index]:[default_text]}
 ---@param opts? table -- Options for snippet.
+---@return snippetNode|snippetNode[]
 function parse(trig, pattern, opts)
 end
 

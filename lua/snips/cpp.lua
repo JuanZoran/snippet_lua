@@ -69,6 +69,7 @@ snips:add(s('cout',
     { t 'std::cout', dyn(1, { t ' << ', i(1, 'stream') }, true), t ';' }))
 
 
+
 snips:add(s('switch', fmta(
     [[
     switch (<>) {<>

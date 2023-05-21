@@ -31,6 +31,11 @@
 function s(context, nodes, opts)
 end
 
+--   ```lua
+--   {
+--   	trig = context
+--   }
+--   ```
 ---@class s_content
 ---@field trig string 默认为纯文本。必须给出的唯一条目。
 ---@field name string 可以被例如 `nvim-compe` 用来识别片段。
@@ -42,9 +47,9 @@ end
 ---@field hidden boolean 完成引擎的提示。如果设置，片段在查询片段时不应显示。
 ---@field priority number 正数，片段的优先级，默认为1000。优先级高的片段将在优先级较低的片段之前匹配到触发器。多个片段的优先级也可以在 `add_snippets` 中设置。
 ---@field snippetType string 应该是 `snippet` 或 `autosnippet` （注意：使用单数形式），决定这个片段是否需要通过 `ls.expand()` 触发，或者是否自动触发（如果你想使用这个功能，不要忘记设置 `ls.config.setup({ enable_autosnippets = true })` ）。如果未设置，取决于如何添加片段，片段将是哪种类型。
---- `@param` : `line_to_cursor`  `string` 光标位置之前的行。
---- `@param` : `matched_trigger`  `string` 完全匹配的触发器（可以从 `line_to_cursor` 中检索，但我们已经有了这个信息:D）
---- `@param` : captures table 如果触发器是模式，这个列表包含捕获组。再次，可以从 `line_to_cursor` 计算，但我们已经做过了。
+---`@param`: `line_to_cursor`  `string` 光标位置之前的行。
+---`@param`: `matched_trigger`  `string` 完全匹配的触发器（可以从 `line_to_cursor` 中检索，但我们已经有了这个信息:D）
+---`@param`: captures table 如果触发器是模式，这个列表包含捕获组。再次，可以从 `line_to_cursor` 计算，但我们已经做过了。
 ---@field condition fun(line_to_cursor:string, matched_trigger: string, captures: string): boolean
 --- `@param` : line_to_cursor string, 光标位置之前的行。
 -- 这个函数被完成引擎（应该是）评估，表示是否应该将片段包含在当前的完成候选项中。
@@ -69,6 +74,9 @@ end
 ---@field callbacks table 包含在进入/离开此片段的节点时被调用的函数。
 ---@field child_ext_opts table 控制应用于此片段的子节点的 `ext_opts` 。在[ext_opts](https://chat.openai.com/?model=gpt-4#ext_opts)部分有更多关于这些的信息。
 
+---@param text string|string[]
+---@param node_opts? table
+---@return snippetNode
 -- 最简单的节点类型；只是文本。
 --
 -- ```lua
@@ -89,23 +97,18 @@ end
 --
 -- ```lua
 -- s("trigger", {
---      t({"Wow! Text!", "And another line."})
+-- 	t({"Wow! Text!", "And another line."})
 -- })
---
 -- ```
----@param text string|string[]
----@param node_opts? table
----@return snippetNode
 function t(text, node_opts)
 end
 
 ---@param jump_index number @这决定了何时跳转到此节点（见[基础-跳转索引](https://chat.openai.com/?model=gpt-4#jump-index)）。
 ---@param text string|string[]? @单个字符串仅用于一行，具有>1项的列表用于多行。这个文本将在跳入 `insertNode` 时被SELECT选中。
----@param node_opts? table @在[节点](https://chat.openai.com/?model=gpt-4#node)中有说明。
+---@param node_opts? table @在[节点]中有说明。
 ---@return snippetNode
 --
 -- 这些节点包含可编辑文本，可以被跳转到和跳转出（例如传统的占位符和标签停止，如 textmate-snippets 中的 `$1` ）。
---
 -- 这个功能最好通过示例来展示：
 -- ```lua
 -- s("trigger", {
@@ -117,7 +120,6 @@ end
 --
 -- 插入节点的访问顺序是 `1,2,3,..,n,0` .
 -- (跳转索引为 0 的也 _必须_ 属于一个 `insertNode` ！)
---
 -- 所以，插入节点跳转的顺序如下：
 --
 -- 1. 扩展后，光标位于插入节点 1，
@@ -127,7 +129,13 @@ end
 -- 如果在一个片段中找不到第 0 个插入节点，会在所有其他节点之后自动插入一个。
 --
 -- 跳转顺序不必遵循节点的 "文本" 顺序：
--- `lua -- s("trigger", { -- t({"After jumping forward once, cursor is here ->"}), i(2), -- t({"", "After expanding, the cursor is here ->"}), i(1), -- t({"", "After jumping once more, the snippet is exited there ->"}), i(0), -- }) --` 
+-- ```lua
+-- s("trigger", {
+-- 	t({"After jumping forward once, cursor is here ->"}), i(2),
+-- 	t({"", "After expanding, the cursor is here ->"}), i(1),
+-- 	t({"", "After jumping once more, the snippet is exited there ->"}), i(0),
+-- })
+-- ```
 --
 -- 上述片段的行为如下：
 --
@@ -147,20 +155,18 @@ end
 -- 	})
 -- })
 -- ```
-function i(jump_index, text, node_opts)
-end
-
-
-
 -- 与例如 textmate 语法相比，其中 tabstops 是全局的片段：
 -- `snippet -- ${1:First jump} :: ${2: ${3:Third jump} : ${4:Fourth jump}} --` -- (当然这并不是完全相同的片段，但是尽可能接近)
-
 -- (重启规则只在用 lua 定义片段时适用，以上的 textmate 片段在解析时会正确展开)。
-
 -- 如果 `jump_index` 是 `0` ，替换它的 `text` 将使其离开 `insertNode` -- (关于原因，请参阅 Luasnip#110)。
 function i(jump_index, text, node_opts)
 end
 
+
+---@param fn fun(argnode_text: string[][], parent: snippetNode, user_args1: any, ...: any) : string|string[]
+---@param argnodes_text? node_reference[] 当前包含在 argnodes 中的文本
+---@param argnode_references? node_reference[] argnodes 的节点引用
+---@return snippetNode
 -- `argnodes_text` 在函数评估期间：
 --- `fun(argnode_text: string[][], parent: Node, user_args1: any, ...: any) : string|string[]` --- `@param`  `argnode_text`  `string[][]` 包含在 argnodes 中的当前文本
 --- (例如 `{{line1}, {line1, line2}}` )。片段缩进将从所有后续行中删除。
@@ -176,10 +182,6 @@ end
 ---
 --- `fn` 应返回一个字符串，将按原样插入，或者一个多行字符串的字符串表，
 --- 其中所有后续行将以片段的缩进为前缀。
----@param fn fun(argnode_text: string[][], parent: snippetNode, user_args1: any, ...: any) : string|string[]
----@param argnodes_text? node_reference[] 当前包含在 argnodes 中的文本
----@param argnode_references? node_reference[] argnodes 的节点引用
----@return snippetNode
 -- ```lua
 -- local function fn(
 --   args,     -- text from i(2) in this example i.e. { { "456" } }
@@ -229,19 +231,21 @@ end
 function f(fn, argnodes_text, argnode_references, node_opts)
 end
 
-
 -- SnippetNodes 直接将它们的内容插入到周围的片段中。
-
 -- 对于 `choiceNode` 和 `dynamicNode` 很有用，其中节点在运行时创建并作为 `snippetNode` 插入。
-
 -- 它们的语法类似于 `s` ，然而，其中片段需要一个表来指定何时扩展， `snippetNode` 和 `insertNode` 一样，期望跳跃索引。
-
--- `lua -- s("trig", sn(1, { -- t("basically just text "), -- i(1, "And an insertNode.") -- })) --` -- 这些进一步解释在[Snippets](https://chat.openai.com/?model=gpt-4#snippets)中。
+--
+-- ```lua
+--  s("trig", sn(1, {
+--  	t("basically just text "),
+--  	i(1, "And an insertNode.")
+--  }))
+-- ```
 ---@param jump_index number? 由于可以跳到 snippetNodes，因此它们需要一个跳跃索引 (在[Basics-Jump-Index](https://chat.openai.com/?model=gpt-4#jump-index)中的信息)。
 -- 注意 `snippetNode` 不接受 `i(0)` ，因此其中的节点的跳跃索引必须在 `1,2,...,n` 中。
 ---@param nodes snippetNode[]|snippetNode 节点。节点列表将转化为一个 `snippetNode` 。
 -- - `node_opts` : `table` : 同样，支持所有节点的常见键（在
---[Node](https://chat.openai.com/?model=gpt-4#node)中记录），还有
+--[Node]中记录），还有
 -- - `callbacks` ,
 -- - `child_ext_opts` 和
 -- - `merge_child_ext_opts` ,
@@ -266,9 +270,9 @@ end
 --  }))
 -- ```
 --
--- - `node_opts` : `table` . `choiceNode` 支持在[Node](https://chat.openai.com/?model=gpt-4#node)中描述的所有节点的公共键，以及一个附加键：
--- - `restore_cursor` : 默认为 `false` 。如果设置了它，并且正在编辑的节点也出现在切换到的选项中（如果在两个选择中都有 `restoreNode` ，就可能是这种情况），则相对于该节点恢复光标。
--- 默认为 `false` ，因为启用可能会导致性能下降。通过将 `choiceNode` 构造函数包装在另一个函数中，将 `opts.restore_cursor` 设置为 `true` ，然后使用该函数构造 `choiceNode` ，可以覆盖默认值：
+-- - `node_opts` : `table` . `choiceNode` 支持在[Node]中描述的所有节点的公共键，以及一个附加键：
+--   - `restore_cursor`: `默认为 `false` 。如果设置了它，并且正在编辑的节点也出现在切换到的选项中（如果在两个选择中都有 `restoreNode` ，就可能是这种情况），则相对于该节点恢复光标。
+--      默认为 `false` ，因为启用可能会导致性能下降。通过将 `choiceNode` 构造函数包装在另一个函数中，将 `opts.restore_cursor` 设置为 `true` ，然后使用该函数构造 `choiceNode` ，可以覆盖默认值
 --     ```lua
 --     local function restore_cursor_choice(pos, choices, opts)
 --         if opts then
@@ -284,6 +288,7 @@ end
 --
 -- 因为只有可能（目前）从 choiceNode 内部改变选择，所以请确保所有的选择都有一些光标可以停止的地方！
 -- 这意味着在 `sn(nil, {...nodes...})` 中 `nodes` 必须包含例如一个 `i(1)` ，否则 luasnip 将只是 "跳过" 这些节点，使得无法改变选择。
+--
 -- ```lua
 -- c(1, {
 -- 	t"some text", -- textNodes are just stopped at.
@@ -294,22 +299,82 @@ end
 -- ```
 --
 -- choiceNode 的活动选择可以通过调用 `ls.change_choice(1)` (向前) 或 `ls.change_choice(-1)` (向后)，或者通过调用 `ls.set_choice(choice_indx)` 来改变。
+--
 -- 一个简单的与 choiceNodes 交互的方式是将 `change_choice(1/-1)` 绑定到键：
+--
 -- 除此之外，还有一个选择器 -- 其中无需循环就可以立即选择任何选项，通过按下对应的数字即可选中。
 function c(jump_index, choices, node_opts)
 end
 
---- DynamicNodes 允许运行时在运行时插入节点。
--- `dynamicNode` 简单地计算其函数，并将返回的 `node` 插入到它周围的 `snippetNode` 中。其函数期望 `() -> snippetNode[]` 或者 `() -> snippetNode` 。
--- 对于 `choiceNode` 和 `dynamicNode` ， `snippetNode` 很有用，其中在运行时创建节点并作为 `snippetNode` 插入。
--- `dynamicNode` 的用途可能很广泛，从插入文件的内容到根据当前上下文更改代码块的样式都可能。
--- `dynamicNode` 也可能返回一个 `dynamicNode` ，但请注意 `dynamicNode` 只在它们首次被访问时求值，所以更改返回的 `dynamicNode` 的函数并不会在下次访问时求值。
--- `dynamicNode` 的用例在 `Examples` 下面有详细描述。
----@param fn fun():snippetNode[]|snippetNode 函数应该返回一组 `snippetNode` 或一个 `snippetNode` 。
----@param node_opts? table `dynamicNode` 支持在[Node](https://chat.openai.com/?model=gpt-4#node)中描述的所有节点的公共键，以及一个附加键：
--- - `regenerate` : 默认为 `false` 。在每次访问节点时都调用函数并将新节点插入周围的 `snippetNode` 。启用可能会导致性能下降，因此默认禁用。通过将 `dynamicNode` 构造函数包装在另一个函数中，将 `opts.regenerate` 设置为 `true` ，然后使用该函数构造 `dynamicNode` ，可以覆盖默认值：
--- `lua -- local function regenerate_dynamic(fn, opts) -- if opts then -- opts.regenerate = true -- else -- opts = {regenerate = true} -- end -- return d(fn, opts) -- end --` ---@return dynamicNode
-function d(fn, node_opts)
+-- # DynamicNode
+-- 与FunctionNode非常相似，但返回的是SnippetNode而不仅仅是文本，
+-- 这使得它们在基于用户输入改变部分片段的情况下非常强大。
+---@param jump_index number 正如所有可以跳转的节点，它在跳转列表中的位置([基础-跳跃-索引](#jump-index))。
+---当argnodes的文本更改时调用此函数。它应生成并返回（包装在`snippetNode`内）节点，这些节点将被插入到dynamicNode的位置。
+---     `@param` `args` `表格 of text` (`{{"node1line1", "node1line2"}, {"node2line1"}}`) 来自`dynamicNode`依赖的节点。
+---     `@param` `parent` `dynamicNode`的直接父节点。
+---     `@param` `old_state` 用户定义的表格。此表格可以包含任何内容；其预期用途是保存从以前生成的`snippetNode`的信息。如果`dynamicNode`依赖于其他节点，它可能会被重构，这意味着所有用户输入（在`insertNodes`中插入的文本，更改的选择）到之前的`dynamicNode`都将丢失。
+--      `old_state`表格必须存储在函数返回的`snippetNode`中（`snippetNode.old_state`）。
+--      下面的第二个例子说明了`old_state`的使用。
+---     `@param` `user_args` 从`dynamicNode`-opts中传递；可能有多个参数。
+---@param func fun(args: 表格, parent: snippetNode, old_state: 表格, user_args: 表格): snippetNode
+--   [节点引用](#node-reference) 到`dynamicNode`依赖的节点：如果这些触发了更新
+--   （例如，如果其中的文本发生变化），`dynamicNode`的函数将被执行，结果
+--   将插入到`dynamicNode`的位置。
+--   （在这方面，`dynamicNode`的行为与`functionNode`完全相同）。
+---@param node_references? node_reference[]|node_references|nil
+---@param opts? table
+--
+-- **示例**：
+--
+-- 这个`dynamicNode`插入一个`insertNode`，它复制第一个`insertNode`内的文本。
+-- ```lua
+-- s("trig", {
+--  t"text: ", i(1), t{"", "copy: "},
+--  d(2, function(args)
+--          -- 返回的snippetNode不需要位置；它被插入
+--          -- "在"dynamicNode内部。
+--          return sn(nil, {
+--              -- 跳跃索引对每个snippetNode都是本地的，所以重新开始为1。
+--              i(1, args[1])
+--          })
+--      end,
+--  {1})
+-- })
+-- ```
+--
+-- 这个片段使用`old_state`来计数更新的数量。
+--
+-- 要存储/恢复由`dynamicNode`生成的值或输入到
+-- `insert/choiceNode`，考虑使用即将引入的`restoreNode`而不是`old_state`。
+--
+-- ```lua
+-- local function count(_, _, old_state)
+--  old_state = old_state or {
+--      updates = 0
+--  }
+--
+--  old_state.updates = old_state.updates + 1
+--
+--  local snip = sn(nil, {
+--      t(tostring(old_state.updates))
+--  })
+--
+--  snip.old_state = old_state
+--  return snip
+-- end
+-- ...
+--
+-- ls.add_snippets("all",
+--  s("trig", {
+--      i(1, "change to update"),
+--      d(2, count, {1})
+--  })
+-- )
+-- ```
+-- 就像`functionNode`，`user_args`可以用来重用相似的`dynamicNode`-
+--函数。
+function d(jump_index, func, node_references, opts)
 end
 
 

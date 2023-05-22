@@ -83,7 +83,6 @@ snips:add(s('fe', t '---@format enable'))
 snips:add(s('fd', t '---@format disable'))
 snips:add(s('fdn', t '---@format disable-next'))
 
-
 snips:add(s('if', fmta([[
     if <> then
         <><>
@@ -99,6 +98,7 @@ snips:add(s('if', fmta([[
         i(2, 'body'),
     }, { trim_empty = false })),
 })))
+
 
 -- End Snippets --
 return snips

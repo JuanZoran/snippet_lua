@@ -317,7 +317,7 @@ end
 --      `old_state`表格必须存储在函数返回的`snippetNode`中（`snippetNode.old_state`）。
 --      下面的第二个例子说明了`old_state`的使用。
 ---     `@param` `user_args` 从`dynamicNode`-opts中传递；可能有多个参数。
----@param func fun(args: 表格, parent: snippetNode, old_state: 表格, user_args: 表格): snippetNode
+---@param func fun(args: table, parent: snippetNode, old_state: table, user_args: table): snippetNode
 --   [节点引用](#node-reference) 到`dynamicNode`依赖的节点：如果这些触发了更新
 --   （例如，如果其中的文本发生变化），`dynamicNode`的函数将被执行，结果
 --   将插入到`dynamicNode`的位置。

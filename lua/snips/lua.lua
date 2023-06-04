@@ -36,16 +36,16 @@ snips:add(s('ll', fmt('local {} = {}', {
 --  ╭──────────────────────────────────────────────────────────╮
 --  │                       for Snippet                        │
 --  ╰──────────────────────────────────────────────────────────╯
-snips:add(hid('re', t'return'))
+snips:add(hid('re', t 'return'))
 
 
 snips:add(hida('snip', 'snips:add(${0})'))
 snips:add(hida('p', 'print($0)'))
-snips:add(hida('s', 's($1, ${0})'))
+snips:add(hida('s', 's(${1:trig}, ${0:nodes})'))
 snips:add(hida('pa', "parse('${1:trig}', '$0')"))
 
 
-snips:add(s('l', t 'local '))
+snips:add(s('l', { t 'local ', i(1), t ' = ', i(0) }))
 snips:add(parse('lm', [[
     local M = {}
 
@@ -76,8 +76,13 @@ snips:add(pos('lo', 'local <++> = '))
 snips:add(pos('ps', 'pairs(<++>)'))
 snips:add(pos('ip', 'ipairs(<++>)'))
 snips:add(pos('C', '---@<++> '))
+snips:add(pos('cc', '---@class <++>'))
+snips:add(pos('cf', '---@field <++>'))
+
 snips:add(pos('cmd', '<Cmd><++><CR>'))
 snips:add(pos('req', 'local <++> = require("<++>")'))
+
+
 
 snips:add(s('fe', t '---@format enable'))
 snips:add(s('fd', t '---@format disable'))
@@ -98,6 +103,9 @@ snips:add(s('if', fmta([[
         i(2, 'body'),
     }, { trim_empty = false })),
 })))
+
+
+snips:add(hid('..', dyn(1, { t '.. ', i(1, 'str') }, true)))
 
 
 -- End Snippets --

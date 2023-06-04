@@ -87,8 +87,28 @@ snips:add(s('switch', fmta(
 )))
 
 
--- snips:add(s('cout',
---     { t 'std::cout << ', i(1, 'stream'), dyn(2, { t ' << ', i(1, 'stream') }), t ';' }))
+snips:add(s('ios', t { '#include <iostream>', '' }))
+-- snips:add(s('lam', fmta [[
+--     [{capture}]({args}{extra}) {
+--         {body}
+--     };
+-- ]], {
+--     capture = i(1, 'capture'),
+--     args = i(2, 'args'),
+--     extra = dyn(3, { t ', ', i(1, 'args') }),
+--     body = i(4, 'body'),
+-- }))
+snips:add(s('lam', fmta([[
+    [<capture>](<args><extra>) {
+        <body>
+    };
+]], {
+    capture = i(1, 'capture'),
+    args = i(2, 'args'),
+    extra = dyn(3, { t ', ', i(1, 'args') }),
+    body = i(4, 'body'),
+})))
+
 
 -- End Snippets --
 return snips
